@@ -12,10 +12,13 @@
                     <div>
                         <x-follow-ctr :user="$post->user" class="flex gap-2">
                             <a class="hover:underline" href="{{ route('profile.show',$post->user) }}">{{ $post->user->name }}</a>
+                            
+                            @auth
                             &middot;
-                            <button @click="follow()" 
+                                <button @click="follow()" 
                                     x-text="following ? 'Unfollow' : 'Follow'"
                                     :class="following ? 'text-red-600':'text-emerald-500'" ></button>
+                            @endauth
                         </x-follow-ctr>
                         <div class="flex gap-2 text-sm text-gray-500">
                             {{ $post->readTime() }} min read
@@ -28,13 +31,14 @@
                 </div>
                 {{-- Clap section --}}
                 <div class="mt-8 p-4 border-t border-b">
-                    <x-clap-button/>
+                    <x-clap-button :post="$post"/>
                     
                 </div>
                 {{-- Clap section end--}}
                 {{-- Post Area--}}
                 <div class="mt-8">
-                    <img src="{{ Storage::url($post->image) }}" class="w-full" alt="{{ $post->title }}">
+                    
+                    <img src="{{ $post->imageUrl() }}" class="w-full" alt="{{ $post->title }}">
                     <div class="mt-4">
                         {{ $post->content }}
                     </div>
@@ -42,7 +46,7 @@
                 {{-- Post area ends --}}
                 <div class="mt-8 flex gap-2 ">
                     <span class="px-4 py-2 bg-gray-200 rounded-xl">{{ $post->category->name }}</span>
-                    <x-clap-button/>
+                    <x-clap-button :post="$post"/>
                 </div>
             </div>
 

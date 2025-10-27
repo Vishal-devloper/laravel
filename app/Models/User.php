@@ -7,11 +7,14 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail , HasMedia
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable,InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -21,11 +24,13 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'username',
-        'image',
+        // 'image',
         'bio',
         'email',
         'password',
     ];
+
+    
 
     /**
      * The attributes that should be hidden for serialization.
@@ -42,6 +47,16 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @return array<string, string>
      */
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this
+            ->addMediaConversion('avatar')
+            ->crop(128,128);
+            
+
+        
+    }
     protected function casts(): array
     {
         return [
@@ -59,7 +74,18 @@ class User extends Authenticatable implements MustVerifyEmail
     public function followers(){
         return $this->belongsToMany(User::class,'followers','user_id','follower_id');
     }
-    public function isFollowedBy(User $user){
+    public function isFollowedBy(?User $user){
+        if(!$user)
+        {
+            return false;
+        }
         return $this->followers()->where('follower_id',$user->id)->exists();
+    }
+    public function hasClapped(Post $post){
+        
+        return $post->claps()->where('user_id',$this->id)->exists();
+    }
+    public function imageUrl(){
+       return $this->getFirstMedia()?->getUrl('avatar');
     }
 }

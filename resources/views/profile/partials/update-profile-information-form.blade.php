@@ -16,9 +16,9 @@
     <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="mt-6 space-y-6">
         @csrf
         @method('patch')
-        @if ($user->image)
+        @if ($user->getFirstMedia())
             <div>
-                <img src="{{ Storage::url($user->image) }}" alt="{{ $user->name }}" class="rounded-full h-20 w-20">
+                <img src="{{ $user->imageUrl() }}" alt="{{ $user->name }}" class="rounded-full h-20 w-20">
             </div>
         @else
             <div>
